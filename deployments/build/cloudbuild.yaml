@@ -1,0 +1,117 @@
+steps:
+  ###
+  # CI Pipeline
+  ###
+  - name: ""
+    id: "Run Pre-build check"
+    entrypoint: "/bin/bash"
+    args:
+      - -c
+      - |
+        ./build/check_commit_message.sh ${_COMMIT_CHECK_RESULT}
+
+        ./build/check_image_tag_exist.sh "${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}" $COMMIT $_TAG_CHECK_RESULT
+
+  - name: "gcr.io/k8s-skaffold/pack"
+    id: Build with buildpack
+    entrypoint: "/bin/bash"
+    args:
+      - -c
+      - |
+        commit_check_result=$(cat "${_COMMIT_CHECK_RESULT}" | tr -d '\n' | tr -d '[:space:]')
+        tag_check_result=$(cat "${_TAG_CHECK_RESULT}" | tr -d '\n' | tr -d '[:space:]')
+
+        if [[ "${commit_check_result}" = "0" && "${tag_check_result}" = "0" && "${_BUILDER}" = "buildpack" ]]; then
+          echo "Run build step using buildpack"
+          
+          pack build \
+            ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}:latest \
+            --builder=${_BUILDPACK_BUILDER} \
+            --path=${_BUILD_PATH}
+
+        else
+          echo "Skip build step using buildpack"
+        fi
+
+  - name: ""
+    id: Build with docker
+    entrypoint: "/bin/bash"
+    args:
+      - -c
+      - |
+        commit_check_result=$(cat "${_COMMIT_CHECK_RESULT}" | tr -d '\n' | tr -d '[:space:]')
+        tag_check_result=$(cat "${_TAG_CHECK_RESULT}" | tr -d '\n' | tr -d '[:space:]')
+
+        if [[ "${commit_check_result}" = "0" && "${tag_check_result}" = "0" && "${_BUILDER}" = "docker" ]]; then
+          echo "Run build step using docker"
+          
+          docker build \
+            -f=${_DOCKERFILE_PATH} \
+            -t=${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}:latest \
+            ${_BUILD_PATH}
+
+        else
+          echo "Skip build step using docker"
+        fi
+
+  - name: ""
+    id: "re-tag image"
+    entrypoint: "/bin/bash"
+    args:
+      - -c
+      - |
+        if [ "${tag_check_result}" = "0" ]; then
+          echo "Run re-tag image step"
+
+          docker tag ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}:latest ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}:$COMMIT 
+          docker tag ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}:latest ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}:$SHORT_SHA
+          
+        else
+          echo "Skip re-tag image step"
+        fi
+
+  - name: ""
+    id: "push all tags"
+    entrypoint: "/bin/bash"
+    args:
+      - -c
+      - |
+        if [ "${tag_check_result}" = "0" ]; then
+          echo "Run push image step"
+
+          docker push --all-tags ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}
+
+        else
+          echo "Skip push image step"
+        fi
+
+  ###
+  # CD Pipeline
+  ###
+  # - name: ""
+  #   id: tofu_init
+  #
+  # - name: ""
+  #   id: tofu_plan
+  #
+  # - name: ""
+  #   id: "tofu_apply"
+
+substitutions:
+  # Build config
+  _BUILDER: "buildpack" #TODO: define image builder "docker" || "buildpack"
+  _BUILD_PATH: "." #TODO build path
+  _DOCKERFILE_PATH: deployments/build/Dockerfile #TODO dockerfile path
+  _BUILDPACK_BUILDER: "gcr.io/buildpacks/builder:latest" # buildpack builder
+
+  _IMAGE_NAME: "" #TODO: define image name
+  _IMAGE_TAG: "" #TODO: define image tag
+  _COMMIT_CHECK_RESULT: /workspace/commit_check.txt
+  _TAG_CHECK_RESULT: /workspace/tag_check.txt
+
+  _TARGET_PROJECT_ID: "" #TODO: define deployment target project ID
+  _ARTIFACT_REGISTRY_URI: asia-southeast2-docker.pkg.dev/${_TARGET_PROJECT_ID}/cloud-run-source-deploy
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  dynamicSubstitutions: true
