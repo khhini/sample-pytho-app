@@ -112,7 +112,7 @@ steps:
   ###########################
   # CD Pipeline
   ###########################
-  - name: ""
+  - name: "ghcr.io/opentofu/opentofu:1.10.1"
     id: Tofu init
     entrypoint: /bin/bash
     args:
@@ -136,7 +136,7 @@ steps:
           -backend-config="bucket=${_TOFU_BACKEND_BUCKET}" \
           -backend-config="prefix=${_TOFU_BACKEND_PREFIX}/${_build_env}"
 
-  - name: ""
+  - name: "ghcr.io/opentofu/opentofu:1.10.1"
     id: Tofu init
     entrypoint: /bin/bash
     args:
@@ -164,7 +164,7 @@ steps:
           -var-file=${_env_path}/terraform.tfvars \
           -out=${_base_dir}/tmp_plan/environments-${_buid_env}.tfplan
 
-  - name: ""
+  - name: "ghcr.io/opentofu/opentofu:1.10.1"
     id: Tofu init
     entrypoint: /bin/bash
     args:
