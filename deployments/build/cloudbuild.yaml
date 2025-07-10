@@ -43,7 +43,9 @@ steps:
         tag_check_result=$(cat "${_TAG_CHECK_RESULT}" | tr -d '\n' | tr -d '[:space:]')
 
         if [[ "${commit_check_result}" = "0" && "${tag_check_result}" = "0" && "${_BUILDER}" = "docker" ]]; then
-          echo "Run build step using docker"
+          echo "########################################"
+          echo "# Run build step using docker"
+          echo "########################################"
           
           docker build \
             -f=${_DOCKERFILE_PATH} \
@@ -51,7 +53,9 @@ steps:
             ${_BUILD_PATH}
 
         else
-          echo "Skip build step using docker"
+          echo "########################################"
+          echo "# Skip build step using docker"
+          echo "########################################"
         fi
 
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
@@ -60,15 +64,21 @@ steps:
     args:
       - -c
       - |
+        tag_check_result=$(cat "${_TAG_CHECK_RESULT}" | tr -d '\n' | tr -d '[:space:]')
+
         if [ "${tag_check_result}" = "0" ]; then
-          echo "Run re-tag image step"
+          echo "########################################"
+          echo "# Run re-tag image step"
+          echo "########################################"
 
           docker tag ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}:latest ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}:$COMMIT_SHA 
           docker tag ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}:latest ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}:$SHORT_SHA
           docker tag ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}:latest ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}:${_IMAGE_TAG}
           
         else
-          echo "Skip re-tag image step"
+          echo "########################################"
+          echo "# Skip re-tag image step"
+          echo "########################################"
         fi
 
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
@@ -77,13 +87,19 @@ steps:
     args:
       - -c
       - |
+        tag_check_result=$(cat "${_TAG_CHECK_RESULT}" | tr -d '\n' | tr -d '[:space:]')
+
         if [ "${tag_check_result}" = "0" ]; then
-          echo "Run push image step"
+          echo "########################################"
+          echo "# Run push image step"
+          echo "########################################"
 
           docker push --all-tags ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}
 
         else
-          echo "Skip push image step"
+          echo "########################################"
+          echo "# Skip push image step"
+          echo "########################################"
         fi
 
   ###
