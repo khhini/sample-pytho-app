@@ -1,7 +1,7 @@
 steps:
-  ###
+  ###########################
   # CI Pipeline
-  ###
+  ###########################
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     id: "Run Pre-build check"
     entrypoint: "/bin/bash"
@@ -109,17 +109,86 @@ steps:
           echo "########################################"
         fi
 
-  ###
+  ###########################
   # CD Pipeline
-  ###
-  # - name: ""
-  #   id: tofu_init
-  #
-  # - name: ""
-  #   id: tofu_plan
-  #
-  # - name: ""
-  #   id: "tofu_apply"
+  ###########################
+  - name: ""
+    id: Tofu init
+    entrypoint: /bin/bash
+    args:
+      - -c
+      - |
+        _build_env=${BRANCH_NAME}
+        if [ "${_build_env}" == "main" ]; then
+          _build_env=prd
+        fi
+
+        _env_path = "environments/${_build_env}
+
+        cd ${_DEPLOYMENT_CONFIG_PATH}
+
+        echo "########################################"
+        echo "# Init tofu state for '${_build_env}'"
+        echo "########################################"
+
+        tofu init \
+          -var-file=${_env_path}/terraform.tfvars \
+          -backend-config="bucket=${_TOFU_BACKEND_BUCKET}" \
+          -backend-config="prefix=${_TOFU_BACKEND_PREFIX}/${_build_env}"
+
+  - name: ""
+    id: Tofu init
+    entrypoint: /bin/bash
+    args:
+      - -c
+      - |
+        _build_env=${BRANCH_NAME}
+        if [ "${_build_env}" == "main" ]; then
+          _build_env=prd
+        fi
+
+        _base_dir = $(pwd)
+        _env_path = "environments/${_build_env}
+
+        if [ ! -d "${_base_dir}/tmp_plan" ]; then
+          mkdir "${_base_dir}/tmp_plan" || exit
+        fi
+
+        cd ${_DEPLOYMENT_CONFIG_PATH}
+
+        echo "########################################"
+        echo "# Generate deployment plan for '${_build_env}'"
+        echo "########################################"
+
+        tofu plan \
+          -var-file=${_env_path}/terraform.tfvars \
+          -out=${_base_dir}/tmp_plan/environments-${_buid_env}.tfplan
+
+  - name: ""
+    id: Tofu init
+    entrypoint: /bin/bash
+    args:
+      - -c
+      - |
+        _build_env=${BRANCH_NAME}
+        if [ "${_build_env}" == "main" ]; then
+          _build_env=prd
+        fi
+
+        _base_dir = $(pwd)
+        _env_path = "environments/${_build_env}
+
+        if [ ! -d "${_base_dir}/tmp_plan" ]; then
+          mkdir "${_base_dir}/tmp_plan" || exit
+        fi
+
+        cd ${_DEPLOYMENT_CONFIG_PATH}
+
+        echo "########################################"
+        echo "# Apply deployment plan for '${_build_env}'"
+        echo "########################################"
+
+        tofu apply ${_base_dir}/tmp_plan/environments-${_buid_env}.tfplan
 
 substitutions:
   # Build config
@@ -127,6 +196,7 @@ substitutions:
   _BUILD_PATH: "." #TODO build path
   _DOCKERFILE_PATH: deployments/build/Dockerfile #TODO dockerfile path
   _BUILDPACK_BUILDER: "gcr.io/buildpacks/builder:latest" # buildpack builder
+  _DEPLOYMENT_CONFIG_PATH: ./deployments
 
   _IMAGE_NAME: "sample-python-app" #TODO: define image name
   _IMAGE_TAG: "test" #TODO: define image tag
@@ -135,6 +205,9 @@ substitutions:
 
   _TARGET_PROJECT_ID: "khhini-devops-2705" #TODO: define deployment target project ID
   _ARTIFACT_REGISTRY_URI: asia-southeast2-docker.pkg.dev/${_TARGET_PROJECT_ID}/docker-repo
+
+  _TOFU_BACKEND_BUCKET: "khhini-devops-2705-bkt" #TODO define tofu state backend
+  _TOFU_BACKEND_PREFIX: "tofu/sample-app/" #TODO define tofu state prefix
 
 options:
   logging: CLOUD_LOGGING_ONLY

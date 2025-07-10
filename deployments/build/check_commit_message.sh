@@ -29,9 +29,9 @@ PATTERN="^cd|^chore\(infra\)|^chore\(permission\)|^feat\(infra\)"
 if echo "${COMMIT_MESSAGE}" | grep -E -q "${PATTERN}"; then
   # If it matches, write "1" to the file
   echo "1" >${RESULT_PATH}
-  echo "Commit message matches the pattern. Wrote '1' to ${RESULT_PATH}"
+  echo "Commit message matches Skip Build step the pattern. Wrote '1' to ${RESULT_PATH}"
 else
   # If it does not match, write "0" to the file
   echo "0" >${RESULT_PATH}
-  echo "Commit message does NOT match the pattern. Wrote '0' to ${RESULT_PATH}"
+  echo "Commit message does NOT match Skip Build step the pattern. Wrote '0' to ${RESULT_PATH}"
 fi
