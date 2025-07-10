@@ -14,7 +14,7 @@ steps:
 
   - name: "gcr.io/k8s-skaffold/pack"
     id: Build with buildpack
-    entrypoint: "/bin/bash"
+    entrypoint: "/bin/sh"
     args:
       - -c
       - |
@@ -33,7 +33,7 @@ steps:
           echo "Skip build step using buildpack"
         fi
 
-  - name: "gcr.io/cloud-builders/docker"
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     id: Build with docker
     entrypoint: "/bin/bash"
     args:
@@ -54,7 +54,7 @@ steps:
           echo "Skip build step using docker"
         fi
 
-  - name: "gcr.io/cloud-builders/docker"
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     id: "re-tag image"
     entrypoint: "/bin/bash"
     args:
@@ -71,7 +71,7 @@ steps:
           echo "Skip re-tag image step"
         fi
 
-  - name: "gcr.io/cloud-builders/docker"
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     id: "push all tags"
     entrypoint: "/bin/bash"
     args:
