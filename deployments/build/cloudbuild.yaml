@@ -3,14 +3,6 @@ steps:
   # CI Pipeline
   ###
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
-    id: cache builder
-    entrypoint: /bin/bash
-
-  - name: "gcr.io/k8s-skaffold/pack"
-    id: cache builder
-    entrypoint: /bin/sh
-
-  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     id: "Run Pre-build check"
     entrypoint: "/bin/bash"
     args:
@@ -71,7 +63,7 @@ steps:
         fi
 
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
-    id: "re-tag image"
+    id: "Tag image"
     entrypoint: "/bin/bash"
     args:
       - -c
@@ -94,7 +86,7 @@ steps:
         fi
 
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
-    id: "push all tags"
+    id: "Push all tags"
     entrypoint: "/bin/bash"
     args:
       - -c
