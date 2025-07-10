@@ -65,6 +65,7 @@ steps:
 
           docker tag ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}:latest ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}:$COMMIT 
           docker tag ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}:latest ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}:$SHORT_SHA
+          docker tag ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}:latest ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}:${_IMAGE_TAG}
           
         else
           echo "Skip re-tag image step"
@@ -104,13 +105,13 @@ substitutions:
   _DOCKERFILE_PATH: deployments/build/Dockerfile #TODO dockerfile path
   _BUILDPACK_BUILDER: "gcr.io/buildpacks/builder:latest" # buildpack builder
 
-  _IMAGE_NAME: "" #TODO: define image name
-  _IMAGE_TAG: "" #TODO: define image tag
+  _IMAGE_NAME: "sample-python-app" #TODO: define image name
+  _IMAGE_TAG: "test" #TODO: define image tag
   _COMMIT_CHECK_RESULT: /workspace/commit_check.txt
   _TAG_CHECK_RESULT: /workspace/tag_check.txt
 
-  _TARGET_PROJECT_ID: "" #TODO: define deployment target project ID
-  _ARTIFACT_REGISTRY_URI: asia-southeast2-docker.pkg.dev/${_TARGET_PROJECT_ID}/cloud-run-source-deploy
+  _TARGET_PROJECT_ID: "khhini-devops-2705" #TODO: define deployment target project ID
+  _ARTIFACT_REGISTRY_URI: asia-southeast2-docker.pkg.dev/${_TARGET_PROJECT_ID}/docker-repo
 
 options:
   logging: CLOUD_LOGGING_ONLY
