@@ -8,9 +8,9 @@ steps:
     args:
       - -c
       - |
-        ./build/check_commit_message.sh ${_COMMIT_CHECK_RESULT}
+        ./deployments/build/check_commit_message.sh ${_COMMIT_CHECK_RESULT}
 
-        ./build/check_image_tag_exist.sh "${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}" $COMMIT_SHA $_TAG_CHECK_RESULT
+        ./deployments/build/check_image_tag_exist.sh "${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}" $COMMIT_SHA $_TAG_CHECK_RESULT
 
   - name: "gcr.io/k8s-skaffold/pack"
     id: Build with buildpack
