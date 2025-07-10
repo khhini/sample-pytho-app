@@ -68,9 +68,11 @@ steps:
     args:
       - -c
       - |
+        commit_check_result=$(cat "${_COMMIT_CHECK_RESULT}" | tr -d '\n' | tr -d '[:space:]')
         tag_check_result=$(cat "${_TAG_CHECK_RESULT}" | tr -d '\n' | tr -d '[:space:]')
 
-        if [ "${tag_check_result}" = "0" ]; then
+        if [[ "${commit_check_result}" = "1" && "${tag_check_result}" = "1" && "${_BUILDER}" = "buildpack" ]]; then
+
           echo "########################################"
           echo "# Run re-tag image step"
           echo "########################################"
@@ -91,9 +93,10 @@ steps:
     args:
       - -c
       - |
+        commit_check_result=$(cat "${_COMMIT_CHECK_RESULT}" | tr -d '\n' | tr -d '[:space:]')
         tag_check_result=$(cat "${_TAG_CHECK_RESULT}" | tr -d '\n' | tr -d '[:space:]')
 
-        if [ "${tag_check_result}" = "0" ]; then
+        if [[ "${commit_check_result}" = "1" && "${tag_check_result}" = "1" && "${_BUILDER}" = "buildpack" ]]; then
           echo "########################################"
           echo "# Run push image step"
           echo "########################################"
