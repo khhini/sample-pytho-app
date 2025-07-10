@@ -10,7 +10,7 @@ steps:
       - |
         ./build/check_commit_message.sh ${_COMMIT_CHECK_RESULT}
 
-        ./build/check_image_tag_exist.sh "${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}" $COMMIT $_TAG_CHECK_RESULT
+        ./build/check_image_tag_exist.sh "${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}" $COMMIT_SHA $_TAG_CHECK_RESULT
 
   - name: "gcr.io/k8s-skaffold/pack"
     id: Build with buildpack
@@ -63,7 +63,7 @@ steps:
         if [ "${tag_check_result}" = "0" ]; then
           echo "Run re-tag image step"
 
-          docker tag ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}:latest ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}:$COMMIT 
+          docker tag ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}:latest ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}:$COMMIT_SHA 
           docker tag ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}:latest ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}:$SHORT_SHA
           docker tag ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}:latest ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}:${_IMAGE_TAG}
           
