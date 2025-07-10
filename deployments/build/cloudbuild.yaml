@@ -2,7 +2,7 @@ steps:
   ###
   # CI Pipeline
   ###
-  - name: ""
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     id: "Run Pre-build check"
     entrypoint: "/bin/bash"
     args:
@@ -33,7 +33,7 @@ steps:
           echo "Skip build step using buildpack"
         fi
 
-  - name: ""
+  - name: "gcr.io/cloud-builders/docker"
     id: Build with docker
     entrypoint: "/bin/bash"
     args:
@@ -54,7 +54,7 @@ steps:
           echo "Skip build step using docker"
         fi
 
-  - name: ""
+  - name: "gcr.io/cloud-builders/docker"
     id: "re-tag image"
     entrypoint: "/bin/bash"
     args:
@@ -71,7 +71,7 @@ steps:
           echo "Skip re-tag image step"
         fi
 
-  - name: ""
+  - name: "gcr.io/cloud-builders/docker"
     id: "push all tags"
     entrypoint: "/bin/bash"
     args:
