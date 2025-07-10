@@ -123,7 +123,7 @@ steps:
           _build_env=prd
         fi
 
-        _env_path = "environments/${_build_env}"
+        _env_path="environments/${_build_env}"
 
         cd ${_DEPLOYMENT_CONFIG_PATH}
 
@@ -147,8 +147,8 @@ steps:
           _build_env=prd
         fi
 
-        _base_dir = $(pwd)
-        _env_path = "environments/${_build_env}"
+        _base_dir=$(pwd)
+        _env_path="environments/${_build_env}"
 
         if [ ! -d "${_base_dir}/tmp_plan" ]; then
           mkdir "${_base_dir}/tmp_plan" || exit
@@ -175,8 +175,8 @@ steps:
           _build_env=prd
         fi
 
-        _base_dir = $(pwd)
-        _env_path = "environments/${_build_env}"
+        _base_dir=$(pwd)
+        _env_path="environments/${_build_env}"
 
         if [ ! -d "${_base_dir}/tmp_plan" ]; then
           mkdir "${_base_dir}/tmp_plan" || exit
