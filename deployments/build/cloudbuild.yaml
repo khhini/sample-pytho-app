@@ -137,7 +137,7 @@ steps:
           -backend-config="prefix=${_TOFU_BACKEND_PREFIX}/${_build_env}"
 
   - name: "ghcr.io/opentofu/opentofu:1.10.1"
-    id: Tofu init
+    id: Tofu plan
     entrypoint: /bin/bash
     args:
       - -c
@@ -165,7 +165,7 @@ steps:
           -out=${_base_dir}/tmp_plan/environments-${_buid_env}.tfplan
 
   - name: "ghcr.io/opentofu/opentofu:1.10.1"
-    id: Tofu init
+    id: Tofu apply
     entrypoint: /bin/bash
     args:
       - -c
