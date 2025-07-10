@@ -3,6 +3,14 @@ steps:
   # CI Pipeline
   ###
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    id: cache builder
+    entrypoint: /bin/bash
+
+  - name: "gcr.io/k8s-skaffold/pack"
+    id: cache builder
+    entrypoint: /bin/sh
+
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     id: "Run Pre-build check"
     entrypoint: "/bin/bash"
     args:
@@ -22,7 +30,9 @@ steps:
         tag_check_result=$(cat "${_TAG_CHECK_RESULT}" | tr -d '\n' | tr -d '[:space:]')
 
         if [[ "${commit_check_result}" = "0" && "${tag_check_result}" = "0" && "${_BUILDER}" = "buildpack" ]]; then
-          echo "Run build step using buildpack"
+          echo "########################################"
+          echo "# Run build step using buildpack"
+          echo "########################################"
           
           pack build \
             ${_ARTIFACT_REGISTRY_URI}/${_IMAGE_NAME}:latest \
@@ -30,7 +40,9 @@ steps:
             --path=${_BUILD_PATH}
 
         else
-          echo "Skip build step using buildpack"
+          echo "########################################"
+          echo "# Skip build step using buildpack"
+          echo "########################################"
         fi
 
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
